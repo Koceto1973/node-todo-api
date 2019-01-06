@@ -1,3 +1,4 @@
+const _ = require('lodash');
 const expect = require('expect');
 const supertest = require('supertest');
 const {ObjectID} = require('mongodb');
