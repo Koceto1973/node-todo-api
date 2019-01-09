@@ -102,7 +102,7 @@ app.patch('/todos/:id', (req, res) => {
 app.post('/users', (req, res) => {
   var body = _.pick(req.body, ['email', 'password']);
   var user = new User(body); // email validator and unique checks run here
-
+  
   user
   .save()
   .then(() => {
@@ -111,7 +111,7 @@ app.post('/users', (req, res) => {
   .then((token) => {
     res.header('x-auth', token).send(user); // custom header
   })
-  .catch((e) => {
+  .catch((e) => { console.log(e);
     res.status(400).send(e);
   })
 });
