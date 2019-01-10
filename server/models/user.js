@@ -53,7 +53,7 @@ UserSchema.methods.generateAuthToken = function () {
 
 };
 
-// new model method
+// new model method, finds and returns user by token
 UserSchema.statics.findByToken = function (token) {
   var User = this;
   var decoded;
