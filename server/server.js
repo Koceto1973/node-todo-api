@@ -1,4 +1,6 @@
-const {port} = require('./config/config');
+// checked package.json
+require('./config/config');
+// checked config.json
 
 var express = require('express');
 var bodyParser = require('body-parser');
@@ -150,8 +152,8 @@ app.delete('/users/me/token', authenticate, (req, res) => {
   });
 });
 
-app.listen(port, () => {
-  console.log(`Started at port ${port}`);
+app.listen(process.env.PORT, () => {
+  console.log(`Started at port ${process.env.PORT}`);
 });
 
 module.exports = {app};
