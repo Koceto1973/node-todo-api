@@ -255,6 +255,7 @@ describe('GET /users/me', () => {
   });
 });
 
+// SIGN UP
 describe('POST /users', () => {
 
   it('should create a user', (done) => {
@@ -307,6 +308,7 @@ describe('POST /users', () => {
 
 });
 
+// LOG IN
 describe('POST /users/login', () => {
 
   it('should login user and return auth token', (done) => {

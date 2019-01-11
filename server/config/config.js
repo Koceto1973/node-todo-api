@@ -1,4 +1,4 @@
-var env = process.env.NODE_ENV || 'development';
+var env = process.env.NODE_ENV || 'development'; // production takes precedence if any
 
 if (env === 'development' || env === 'test') {  // see package json
   var config = require('./config.json');
