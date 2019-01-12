@@ -46,11 +46,11 @@ UserSchema.methods.toJSON = function () {
 }; // document instance method
 
 // user db document => updates user with the generated token and returns the token
-UserSchema.methods.generateAuthToken = function () {
+UserSchema.methods.generateAuthToken = function (currentDeviceId) {
   var user = this;
   var access = 'auth';
   // salting _id to get token
-  var token = jwt.sign({_id: user._id.toHexString(), access},process.env.JWT_SECRET).toString();
+  var token = jwt.sign({_id: user._id.toHexString(), access},process.env.JWT_SECRET+currentDeviceId).toString();
 
   user.tokens = user.tokens.concat([{access, token}]); // adding the new token to the array
 

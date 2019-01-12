@@ -16,22 +16,26 @@ var app = express();
 
 app.use(bodyParser.json());  // middleware for body parsing
 
-// SIGN UP with email, password, response with token in x-auth header
-// switching devices in not implemented
+// SIGN UP ( initial LOG IN from first device )
+// requires valid email property in req.body, otherwise client is informed 
+// requires unique email property in req.body, otherwise client is informed 
+// requires valid password property in req.body, min 6 characters, otherwise client is informed
+// requires currentDeviceId
+// if all required is ok, client is signed up and receives a login token for that particular device
 app.post('/users', (req, res) => {
-  var body = _.pick(req.body, ['email', 'password']);
+  var body = _.pick(req.body, ['email', 'password', 'currentDeviceId']);
   var user = new User(body); // email validator and unique checks run here
   
   user
   .save()
   .then(() => {
-    return user.generateAuthToken();
+    return user.generateAuthToken(body.currentDeviceId);
   })
   .then((token) => {
     res.header('x-auth', token).send({"note":`User ${user.email} signed up successfully!`}); // custom header
   })
   .catch((e) => { 
-    console.log(JSON.stringify(e,null,2)); 
+    // console.log(JSON.stringify(e,null,2)); 
 
     if (e.message.includes('E11000')) {
       res.status(400).send({"note":"Email duplication is not allowed!"});
@@ -41,8 +45,10 @@ app.post('/users', (req, res) => {
   })  
 });
 
-// LOG IN with email, password, response with token
-// switching devices in not implemented
+// LOG IN ( on unused device, or after logout on used device )
+// requires registered email property in req.body, otherwise client is informed 
+// requires corresponding password property in req.body, otherwise client is informed
+// if all required is ok, client is informed and receives a login token
 app.post('/users/login', (req, res) => {
   var body = _.pick(req.body, ['email', 'password']);
 

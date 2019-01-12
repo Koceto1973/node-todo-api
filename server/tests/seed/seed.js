@@ -4,10 +4,9 @@ const jwt = require('jsonwebtoken');
 const {Todo} = require('./../../models/todo');
 const {User} = require('./../../models/user');
 
+// dummy users array for testing
 const userOneId = new ObjectID();
 const userTwoId = new ObjectID();
-
-// dummy users array for testing
 const users = [{
   _id: userOneId,
   email: 'andrew@example.com',
@@ -26,6 +25,16 @@ const users = [{
   }]
 }];
 
+const populateUsers = (done) => {
+  User.remove({})
+  .then(() => {
+    var userOne = new User(users[0]).save();
+    var userTwo = new User(users[1]).save();
+
+    return Promise.all([userOne, userTwo])  // returned promise after all items are saved
+  }).then(() => done());
+};
+
 // dummy todos array for testing
 const todos = [{
     _id: new ObjectID(),
@@ -37,21 +46,16 @@ const todos = [{
     _creator: userTwoId,
     completed: true,
     completedAt: 123456
-  }];
+}];
 
-  const populateTodos = (done) => {
-    Todo.remove({}).then(() => {
-      return Todo.insertMany(todos);
-    }).then(() => done());
-  };
+const populateTodos = (done) => {
+  Todo.remove({})
+  .then(() => {
+    return Todo.insertMany(todos);
+  })
+  .then(() => done());
+};
 
-  const populateUsers = (done) => {
-    User.remove({}).then(() => {
-      var userOne = new User(users[0]).save();
-      var userTwo = new User(users[1]).save();
+
   
-      return Promise.all([userOne, userTwo])  // returned promise after all items are saved
-    }).then(() => done());
-  };
-  
-  module.exports = {todos, populateTodos, users, populateUsers};
+module.exports = {todos, populateTodos, users, populateUsers};

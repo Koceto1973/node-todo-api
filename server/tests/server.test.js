@@ -10,6 +10,73 @@ const {todos, populateTodos, users, populateUsers} = require('./seed/seed');
 beforeEach(populateUsers);
 beforeEach(populateTodos);
 
+// SIGN UP
+describe('POST /users', () => {
+
+  it('correct sign up check', (done) => {
+    var email = 'example@example.com';
+    var password = '123mnb!';
+    var currentDeviceId = 'jskf4u4f4uku4hu44u44k4hq22qq2'
+
+    supertest(app)
+      .post('/users')
+      .send({email, password, currentDeviceId})
+      .expect(200)
+      .expect((res) => {
+        expect(res.headers['x-auth']).toBeTruthy();
+        expect(res.body.note).toBe({"note":`User ${email} signed up successfully!`}.note);
+      })
+      .end((err) => {
+        if (err) {
+          return done(err);
+        }
+        // check the result in db
+        User.findOne({email}).then((user) => {
+          expect(user).toBeTruthy();
+          expect(user.password).not.toBe(password);
+          done();
+        });
+      });
+  });
+
+  it('email consistency check', (done) => {
+    supertest(app)
+      .post('/users')
+      .send({
+        email: 'and',
+        password: 'gfkfidd123',
+        currentDeviceId: 'fkfdli53i2i25tj'
+      })
+      .expect(400)
+      .end(done);
+  });
+
+  it('password consistency check', (done) => {
+    supertest(app)
+      .post('/users')
+      .send({
+        email: 'example@example.com',
+        password: '123',
+        currentDeviceId: 'fkfdli53i2i25tj'
+      })
+      .expect(400)
+      .end(done);
+  });
+
+  it('email duplication check', (done) => {
+    supertest(app)
+      .post('/users')
+      .send({
+        email: users[0].email,
+        password: 'Password123!',
+        currentDeviceId: 'fkfdli53i2i25tj'
+      })
+      .expect(400)
+      .end(done);
+  });
+
+});
+
 describe('POST /todos', () => {
 
   it('should create a new todo', (done) => {
@@ -255,58 +322,7 @@ describe('GET /users/me', () => {
   });
 });
 
-// SIGN UP
-describe('POST /users', () => {
 
-  it('should create a user', (done) => {
-    var email = 'example@example.com';
-    var password = '123mnb!';
-
-    supertest(app)
-      .post('/users')
-      .send({email, password})
-      .expect(200)
-      .expect((res) => {
-        expect(res.headers['x-auth']).toBeTruthy();
-        expect(res.body._id).toBeTruthy();
-        expect(res.body.email).toBe(email);
-      })
-      .end((err) => {
-        if (err) {
-          return done(err);
-        }
-        // check the result in db
-        User.findOne({email}).then((user) => {
-          expect(user).toBeTruthy();
-          expect(user.password).not.toBe(password);
-          done();
-        });
-      });
-  });
-
-  it('should return validation errors if request invalid', (done) => {
-    supertest(app)
-      .post('/users')
-      .send({
-        email: 'and',
-        password: '123'
-      })
-      .expect(400)
-      .end(done);
-  });
-
-  it('should not create user if email in use', (done) => {
-    supertest(app)
-      .post('/users')
-      .send({
-        email: users[0].email,
-        password: 'Password123!'
-      })
-      .expect(400)
-      .end(done);
-  });
-
-});
 
 // LOG IN
 describe('POST /users/login', () => {
