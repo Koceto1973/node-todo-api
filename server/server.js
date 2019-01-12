@@ -14,8 +14,67 @@ var {authenticate} = require('./middleware/authenticate');
 
 var app = express();
 
-app.use(bodyParser.json());
+app.use(bodyParser.json());  // middleware for body parsing
 
+// SIGN UP with email, password, response with token in x-auth header
+// switching devices in not implemented
+app.post('/users', (req, res) => {
+  var body = _.pick(req.body, ['email', 'password']);
+  var user = new User(body); // email validator and unique checks run here
+  
+  user
+  .save()
+  .then(() => {
+    return user.generateAuthToken();
+  })
+  .then((token) => {
+    res.header('x-auth', token).send({"note":`User ${user.email} signed up successfully!`}); // custom header
+  })
+  .catch((e) => { 
+    console.log(JSON.stringify(e,null,2)); 
+
+    if (e.message.includes('E11000')) {
+      res.status(400).send({"note":"Email duplication is not allowed!"});
+    } else {
+      res.status(400).send({"note":e.message});
+    }
+  })  
+});
+
+// LOG IN with email, password, response with token
+// switching devices in not implemented
+app.post('/users/login', (req, res) => {
+  var body = _.pick(req.body, ['email', 'password']);
+
+  User.findByCredentials(body.email, body.password)
+  .then((user) => {
+    return user.generateAuthToken()
+    .then((token) => {
+      res.header('x-auth', token).send(user); // send token back, as log in credential at different device
+    });
+  }).catch((e) => {
+    res.status(400).send();
+  });
+});
+
+app.get('/users/me', authenticate, (req, res) => {
+  res.send(req.user);
+});
+
+// LOG OUT
+// remove requested token from the user who owns that token 
+app.delete('/users/me/token', authenticate, (req, res) => {
+  req.user.removeToken(req.token)
+  .then(() => {
+    res.status(200).send();
+  }, () => {
+    res.status(400).send();
+  });
+});
+
+// SIGN OFF with email, password
+
+// POST todo
 app.post('/todos', authenticate, (req, res) => {
   var todo = new Todo({
     text: req.body.text,
@@ -107,50 +166,7 @@ app.patch('/todos/:id', authenticate, (req, res) => {
   })
 });
 
-// POST /users
-app.post('/users', (req, res) => {
-  var body = _.pick(req.body, ['email', 'password']);
-  var user = new User(body); // email validator and unique checks run here
-  
-  user
-  .save()
-  .then(() => {
-    return user.generateAuthToken();
-  })
-  .then((token) => {
-    res.header('x-auth', token).send(user); // custom header
-  })
-  .catch((e) => { console.log(e);
-    res.status(400).send(e);
-  })
-});
 
-app.get('/users/me', authenticate, (req, res) => {
-  res.send(req.user);
-});
-
-// POST /users/login {email, password}
-app.post('/users/login', (req, res) => {
-  var body = _.pick(req.body, ['email', 'password']);
-
-  User.findByCredentials(body.email, body.password).then((user) => {
-    return user.generateAuthToken().then((token) => {
-      res.header('x-auth', token).send(user);
-    });
-  }).catch((e) => {
-    res.status(400).send();
-  });
-});
-
-// logout route
-// remove requested token from the user who owns that token 
-app.delete('/users/me/token', authenticate, (req, res) => {
-  req.user.removeToken(req.token).then(() => {
-    res.status(200).send();
-  }, () => {
-    res.status(400).send();
-  });
-});
 
 app.listen(process.env.PORT, () => {
   console.log(`Started at port ${process.env.PORT}`);

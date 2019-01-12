@@ -6,6 +6,8 @@ const {User} = require('./../../models/user');
 
 const userOneId = new ObjectID();
 const userTwoId = new ObjectID();
+
+// dummy users array for testing
 const users = [{
   _id: userOneId,
   email: 'andrew@example.com',
@@ -24,7 +26,7 @@ const users = [{
   }]
 }];
 
-// two dummy todos for db list testing
+// dummy todos array for testing
 const todos = [{
     _id: new ObjectID(),
     text: 'First test todo',

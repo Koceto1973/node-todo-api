@@ -1,7 +1,7 @@
 var {User} = require('./../models/user');
 
 var authenticate = (req, res, next) => {
-  var token = req.header('x-auth');
+  var token = req.header('x-auth');  // alias for req.get(header)
 
   User.findByToken(token)
   .then((user) => {
@@ -9,10 +9,13 @@ var authenticate = (req, res, next) => {
       return Promise.reject();
     }
 
+    // modify req
     req.user = user;
     req.token = token;
+    // transfer control to next callback/middleware
     next();
-  }).catch((e) => {
+  })
+  .catch((e) => {
     res.status(401).send();
   });
 };
