@@ -20,7 +20,7 @@ app.use(bodyParser.json());  // middleware for body parsing
 // requires valid email property in req.body, otherwise client is informed 
 // requires unique email property in req.body, otherwise client is informed 
 // requires valid password property in req.body, min 6 characters, otherwise client is informed
-// requires currentDeviceId
+// requires currentDeviceId property in req.body
 // if all required is ok, client is signed up and receives a login token for that particular device
 app.post('/users', (req, res) => {
   var body = _.pick(req.body, ['email', 'password', 'currentDeviceId']);
@@ -45,26 +45,24 @@ app.post('/users', (req, res) => {
   })  
 });
 
-// LOG IN ( on unused device, or after logout on used device )
+// LOG IN ( on unused device, or after logout on a used device )
 // requires registered email property in req.body, otherwise client is informed 
 // requires corresponding password property in req.body, otherwise client is informed
 // if all required is ok, client is informed and receives a login token
 app.post('/users/login', (req, res) => {
-  var body = _.pick(req.body, ['email', 'password']);
+  var body = _.pick(req.body, ['email', 'password', 'currentDeviceId']);
 
   User.findByCredentials(body.email, body.password)
-  .then((user) => {
-    return user.generateAuthToken()
+  .then((user) => {  // user is found, resolve case
+    return user.generateAuthToken(body.currentDeviceId) // should return promise to use .then() after
     .then((token) => {
-      res.header('x-auth', token).send(user); // send token back, as log in credential at different device
+      res.header('x-auth', token).send({"note":`User ${user.email} logged in successfully!`}); // send token back, as log in credential at different device
     });
-  }).catch((e) => {
-    res.status(400).send();
+  })
+  .catch((e) => {  // no user/pass match found, reject case
+    console.log(JSON.stringify(e,null,2)); 
+    res.status(400).send(e);
   });
-});
-
-app.get('/users/me', authenticate, (req, res) => {
-  res.send(req.user);
 });
 
 // LOG OUT
@@ -79,6 +77,11 @@ app.delete('/users/me/token', authenticate, (req, res) => {
 });
 
 // SIGN OFF with email, password
+
+// ??????
+app.get('/users/me', authenticate, (req, res) => {
+  res.send(req.user);
+});
 
 // POST todo
 app.post('/todos', authenticate, (req, res) => {

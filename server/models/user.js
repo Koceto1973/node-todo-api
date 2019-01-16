@@ -50,9 +50,19 @@ UserSchema.methods.generateAuthToken = function (currentDeviceId) {
   var user = this;
   var access = 'auth';
   // salting _id to get token
-  var token = jwt.sign({_id: user._id.toHexString(), access},process.env.JWT_SECRET+currentDeviceId).toString();
+  var token = jwt.sign({_id: user._id.toHexString(), currentDeviceId, access},process.env.JWT_SECRET).toString();
 
-  user.tokens = user.tokens.concat([{access, token}]); // adding the new token to the array
+  // if the token is once issued, just return it
+  var isTokenNew = true;
+  for (var i = 0; i < user.tokens.length; i++) {
+    if (jwt.verify(user.tokens[i].token, process.env.JWT_SECRET).currentDeviceId === currentDeviceId) {
+      isTokenNew = false;
+    }    
+  }
+
+  if (isTokenNew) {
+    user.tokens = user.tokens.concat([{access, token}]); // adding the new token to the array
+  };
 
   // saves the updated with the token user
   return user.save() 
@@ -91,19 +101,16 @@ UserSchema.statics.findByToken = function (token) {
   });
 }; // model method
 
-
-// email, password => user
+// new model method
 UserSchema.statics.findByCredentials = function (email, password) {
-  var User = this;
+  var User = this; // reference to the model
 
-  // check if there is such user by email
-  return User.findOne({email}).then((user) => {
-    if (!user) {
-      return Promise.reject();
-    }
+  return User.findOne({email})
+  .then((user) => {
+    if (!user) { return Promise.reject(); }  // returns rejected promise
 
-    // check if valid password is provided
-    return new Promise((resolve, reject) => { // bcrypt supports only call backs
+    // if (user)
+    return new Promise((resolve, reject) => {
       // Use bcrypt.compare to compare password and user.password
       bcrypt.compare(password, user.password, (err, res) => {
         if (res) {
@@ -116,7 +123,7 @@ UserSchema.statics.findByCredentials = function (email, password) {
 
   });
 
-}; // model method
+}; 
 
 // pre middleware runs before saving users, if user password is changed, rebuild salted hash
 UserSchema.pre('save', function (next) {
