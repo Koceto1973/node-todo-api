@@ -11,6 +11,7 @@ const users = [{
   _id: userOneId,
   email: 'andrew@example.com',
   password: 'userOnePass',
+  currentDeviceId: 'fjkkf444484r4r44r634234433443345',
   tokens: [{
     access: 'auth',
     token: jwt.sign({_id: userOneId, access: 'auth'},process.env.JWT_SECRET).toString()
@@ -19,6 +20,7 @@ const users = [{
   _id: userTwoId,
   email: 'jen@example.com',
   password: 'userTwoPass',
+  currentDeviceId: 'fjkkf444485rt745589d7d4dd5d66ss3s4s6s74s6s4234433443345',
   tokens: [{
     access: 'auth',
     token: jwt.sign({_id: userTwoId, access: 'auth'},process.env.JWT_SECRET).toString()
