@@ -61,7 +61,7 @@ app.post('/users/login', (req, res) => {
   })
   .catch((e) => {  // no user/pass match found, reject case
     console.log(JSON.stringify(e,null,2)); 
-    res.status(400).send(e);
+    res.status(400).send({"note":`Email/password mismatch!`});
   });
 });
 
