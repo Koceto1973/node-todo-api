@@ -57,6 +57,7 @@ UserSchema.methods.generateAuthToken = function (currentDeviceId) {
   for (var i = 0; i < user.tokens.length; i++) {
     if (jwt.verify(user.tokens[i].token, process.env.JWT_SECRET).currentDeviceId === currentDeviceId) {
       isTokenNew = false;
+      token = user.tokens[i].token;
     }    
   }
 
@@ -78,6 +79,9 @@ UserSchema.methods.removeToken = function (token) {
     $pull: { // remove item ftom array, matching criteria https://docs.mongodb.com/manual/reference/operator/update/pull/
       tokens: {token}
     }
+  })
+  .catch ((e)=>{
+    return Promise.reject(e);
   });
 }; // document instance method
 
@@ -90,14 +94,12 @@ UserSchema.statics.findByToken = function (token) {
     // unsalting token to get _id
     decoded = jwt.verify(token,process.env.JWT_SECRET);
   } catch (e) {
-    console.log('Token verification failed.');
-    return Promise.reject();    
+    return Promise.reject('Token decoding failure!');    
   }
 
-  return User.findOne({
-    '_id': decoded._id,
-    'tokens.token': token,
-    'tokens.access': 'auth'
+  return User.findOne({'_id': decoded._id })
+  .catch((e)=>{
+    return Promise.reject('Data base search by _id failure!');  
   });
 }; // model method
 
