@@ -160,10 +160,10 @@ describe('POST /users/login', () => {
 });
 
 // Authentification
-describe('GET /users/me', () => {
+describe('GET /users/me/token', () => {
   it('should return 200 / user if authenticated', (done) => {
     supertest(app)
-      .get('/users/me')
+      .get('/users/me/token')
       .set('x-auth', users[0].tokens[0].token)
       .expect(200)
       // .expect((res) => {  // disabled for security
@@ -175,7 +175,7 @@ describe('GET /users/me', () => {
 
   it('should return 401 if not authenticated', (done) => {
     supertest(app)
-      .get('/users/me')
+      .get('/users/me/token')
       .expect(401)
       .expect((res) => {
         expect(res.body).not.toEqual({});
@@ -205,6 +205,10 @@ describe('DELETE /users/me/token', () => {
       });
   });
 });
+
+// LOG OUT all
+
+// SIGN OFF
 
 describe('POST /todos', () => {
 

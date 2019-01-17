@@ -68,7 +68,7 @@ app.post('/users/login', (req, res) => {
 });
 
 // authentification route
-app.get('/users/me', authenticate, (req, res) => {
+app.get('/users/me/token', authenticate, (req, res) => {
   try {
     if (req.error) { 
       console.log(JSON.stringify(req.error,null,2)); 
@@ -83,8 +83,8 @@ app.get('/users/me', authenticate, (req, res) => {
   };
 });
 
-// LOG OUT
-// remove requested token from the user who owns that token 
+// LOG OUT current ( from current device )
+// remove requested token from the user who owns auth token 
 app.delete('/users/me/token', authenticate, (req, res) => {
 
   req.user.removeToken(req.token)
@@ -97,7 +97,25 @@ app.delete('/users/me/token', authenticate, (req, res) => {
   });
 });
 
-// SIGN OFF with email, password
+// LOG OUT all ( from all devices )
+// remove all tokens from the user who owns auth token 
+app.delete('/users/me/tokens', authenticate, (req, res) => {
+  try {
+    for (var i = 0; i < req.user.tokens.length; i++) {
+      req.user.removeToken(req.user.tokens[i].token)
+    }
+
+    res.status(200).send({"note":`User complete log out success!`});
+  } catch(e) {
+    console.log(JSON.stringify(e,null,2)); 
+    res.status(400).send({"note":`User complete log out failure!`});
+  }  
+});
+
+// SIGN OFF with email, password ( user account and data deletion )
+app.delete('/users/me', authenticate, (req,res) =>{
+  res.status(200).send({"note":`User sign off success!`});
+});
 
 /////////////////////////////////  DATA API   /////////////////////////////////////////////////
 
