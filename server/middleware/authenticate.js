@@ -15,6 +15,9 @@ var authenticate = (req, res, next) => {
     req.token = token;  // next callback has to know which token to remove
     // transfer control to next callback/middleware
     next();
+  }, (error) => {
+    req.error = error;
+    next(); 
   })
   .catch((e) => {
     return Promise.reject(e);

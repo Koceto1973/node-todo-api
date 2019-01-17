@@ -93,7 +93,7 @@ UserSchema.statics.findByToken = function (token) {
   try {
     // unsalting token to get _id
     decoded = jwt.verify(token,process.env.JWT_SECRET);
-  } catch (e) {
+  } catch(e) {
     return Promise.reject('Token decoding failure!');    
   }
 

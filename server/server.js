@@ -16,6 +16,8 @@ var app = express();
 
 app.use(bodyParser.json());  // middleware for body parsing
 
+//////////////////////  AUTH API ///////////////////////////////
+
 // SIGN UP ( initial LOG IN from first device )
 // requires valid email property in req.body, otherwise client is informed 
 // requires unique email property in req.body, otherwise client is informed 
@@ -65,6 +67,22 @@ app.post('/users/login', (req, res) => {
   });
 });
 
+// authentification route
+app.get('/users/me', authenticate, (req, res) => {
+  try {
+    if (req.error) { 
+      console.log(JSON.stringify(req.error,null,2)); 
+      res.status(401).send({"note":`Token process failure!`});
+    };
+
+    res.status(200).send()  // res.status(200).send(req.user);  // disabled for security
+  } catch { (e)=>{
+    console.log(JSON.stringify(e,null,2)); 
+    res.status(401).send({"note":`Token process failure!`});
+    }
+  };
+});
+
 // LOG OUT
 // remove requested token from the user who owns that token 
 app.delete('/users/me/token', authenticate, (req, res) => {
@@ -81,10 +99,7 @@ app.delete('/users/me/token', authenticate, (req, res) => {
 
 // SIGN OFF with email, password
 
-// ??????
-app.get('/users/me', authenticate, (req, res) => {
-  res.send(req.user);
-});
+/////////////////////////////////  DATA API   /////////////////////////////////////////////////
 
 // POST todo
 app.post('/todos', authenticate, (req, res) => {
