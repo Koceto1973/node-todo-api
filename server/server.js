@@ -112,9 +112,24 @@ app.delete('/users/me/tokens', authenticate, (req, res) => {
   }  
 });
 
-// SIGN OFF with email, password ( user account and data deletion )
+// SIGN OFF with token ( user account and data deletion )
 app.delete('/users/me', authenticate, (req,res) =>{
-  res.status(200).send({"note":`User sign off success!`});
+  try {
+    if (!req.user) {
+      throw new Error('');
+    }
+
+    User.findOneAndRemove({ _id: req.user._id })
+    .then(()=>{
+      res.status(200).send({"note":`User sign off success!`});
+    }, (err)=>{
+      throw err;
+    });    
+  } catch(e) {
+    console.log(JSON.stringify(e,null,2)); 
+    res.status(400).send({"note":`User sign off failure!`});
+  }   
+  
 });
 
 /////////////////////////////////  DATA API   /////////////////////////////////////////////////
