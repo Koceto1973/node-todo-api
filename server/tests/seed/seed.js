@@ -7,14 +7,21 @@ const {User} = require('./../../models/user');
 // dummy users array for testing
 const userOneId = new ObjectID();
 const userTwoId = new ObjectID();
+
+currentDeviceId_1 = 'fjkkf444484r4r44r634234433443345';
+currentDeviceId_2 = 'fkd4ht934r843fj89394faaw3ej39j39';
+
+
 const users = [{
   _id: userOneId,
   email: 'andrew@example.com',
   password: 'userOnePass',
-  currentDeviceId: 'fjkkf444484r4r44r634234433443345',
   tokens: [{
     access: 'auth',
-    token: jwt.sign({_id: userOneId, access: 'auth'},process.env.JWT_SECRET).toString()
+    token: jwt.sign({_id: userOneId, access: 'auth', currentDeviceId: currentDeviceId_1 },process.env.JWT_SECRET).toString()
+  }, {
+    access: 'auth',
+    token: jwt.sign({_id: userOneId, access: 'auth', currentDeviceId:currentDeviceId_2 },process.env.JWT_SECRET).toString()
   }]
 }, {
   _id: userTwoId,

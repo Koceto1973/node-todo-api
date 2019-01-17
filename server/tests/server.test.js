@@ -198,7 +198,7 @@ describe('DELETE /users/me/token', () => {
 
         User.findById(users[0]._id)
         .then((user) => {
-          expect(user.tokens.length).toBe(0);
+          expect(user.tokens.length).toBe(1);
           done();
         })
         .catch((e) => done(e));
@@ -207,6 +207,26 @@ describe('DELETE /users/me/token', () => {
 });
 
 // LOG OUT all
+describe('DELETE /users/me/tokens', () => {
+  it('should remove all auth tokens on logout', (done) => {
+    supertest(app)
+      .delete('/users/me/tokens')
+      .set('x-auth', users[0].tokens[0].token)
+      .expect(200)
+      .end((err, res) => {
+        if (err) {
+          return done(err);
+        }
+
+        User.findById(users[0]._id)
+        .then((user) => {
+          expect(user.tokens.length).toBe(0);
+          done();
+        })
+        .catch((e) => done(e));
+      });
+  });
+});
 
 // SIGN OFF
 
