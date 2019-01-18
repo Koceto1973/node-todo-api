@@ -300,6 +300,7 @@ describe('POST /todos', () => {
 
 });
 
+// GET notes
 describe('GET /todos', () => {
   it('should get all todos', (done) => {
     supertest(app)

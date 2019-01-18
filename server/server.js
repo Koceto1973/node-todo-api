@@ -140,11 +140,13 @@ app.post('/todos', authenticate, (req, res) => {
   var todo = new Todo();
 
   try {
-    if(req.body.text) {
+    if(!req.user ) {
+      throw 'Bad request body - faulty token!' ;
+    } else if ( !req.body.text) {
+      throw 'Bad request body - missing text property!'
+    } else {
       todo.text = req.body.text;
       todo._creator = req.user._id;
-    } else {
-      throw 'Bad request body - missing text property!'
     }
 
     todo.save().then(() => {
@@ -159,12 +161,14 @@ app.post('/todos', authenticate, (req, res) => {
 
 });
 
+// GET notes
 app.get('/todos', authenticate, (req, res) => {
   Todo.find({ _creator: req.user._id
   }).then((todos) => {
     res.send({todos});
   }, (e) => {
-    res.status(400).send(e);
+    console.log(JSON.stringify(e,null,2)); 
+    res.status(400).send({"note":`Notes fetching failure!`});
   });
 });
 
