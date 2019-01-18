@@ -262,7 +262,7 @@ describe('POST /todos', () => {
       .send({text})
       .expect(200)
       .expect((res) => {
-        expect(res.body.text).toBe(text);
+        expect(res.body.note).toBe("New note created!");
       })
       .end((err, res) => {
         if (err) {
@@ -285,7 +285,7 @@ describe('POST /todos', () => {
       .set('x-auth', users[0].tokens[0].token)
       .send({})
       .expect(400)
-      .end((err, res) => {
+      .end((err, res) => { 
         if (err) {
           return done(err);
         }

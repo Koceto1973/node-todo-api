@@ -137,16 +137,20 @@ app.delete('/users/me', authenticate, (req,res) =>{
 // POST note
 app.post('/todos', authenticate, (req, res) => {
   
+  var todo = new Todo();
+
   try {
-    var todo = new Todo({
-      text: req.body.text,
-      _creator: req.user._id
-    });
-  
+    if(req.body.text) {
+      todo.text = req.body.text;
+      todo._creator = req.user._id;
+    } else {
+      throw 'Bad request body - missing text property!'
+    }
+
     todo.save().then(() => {
       res.status(200).send({"note":"New note created!"});
     }, (err) => {
-      throw err;
+      throw 'Saving note to database failed!';
     }); 
   } catch(e) {
     console.log(JSON.stringify(e,null,2)); 
