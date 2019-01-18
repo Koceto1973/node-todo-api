@@ -302,13 +302,24 @@ describe('POST /todos', () => {
 
 // GET notes
 describe('GET /todos', () => {
-  it('should get all todos', (done) => {
+  it('should get all notes', (done) => {
     supertest(app)
       .get('/todos')
       .set('x-auth', users[0].tokens[0].token)
       .expect(200)
       .expect((res) => {
-        expect(res.body.todos.length).toBe(1);
+        expect(res.body.notes.length).toBe(1);
+      })
+      .end(done);
+  });
+
+  it('should not get notes if token is faulty', (done) => {
+    supertest(app)
+      .get('/todos')
+      .set('x-auth', "123456789")
+      .expect(400)
+      .expect((res) => {
+        expect(res.body.note).toBe(`Notes fetching failure!`);
       })
       .end(done);
   });
