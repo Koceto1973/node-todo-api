@@ -163,13 +163,33 @@ app.post('/todos', authenticate, (req, res) => {
 
 // GET notes
 app.get('/todos', authenticate, (req, res) => {
-  Todo.find({ _creator: req.user._id
-  }).then((todos) => {
-    res.send({todos});
-  }, (e) => {
+
+  try {
+    if(!req.user ) {
+      throw 'Bad request body - faulty token!' ;
+    } else {
+      Todo.find({ _creator: req.user._id
+      }).then((todos) => {
+        
+        var notes = [];
+        for(var i=0;i<todos.length;i++){
+          var note = {
+            "text": todos[i].text,
+            "completed": todos[i].completed,
+            "completedAt": todos[i].completedAt
+          }
+          notes.push(note);
+        };
+        res.status(200).send({notes});
+      }, (e) => {
+        throw e;
+      });
+    }
+
+  } catch(e) {
     console.log(JSON.stringify(e,null,2)); 
     res.status(400).send({"note":`Notes fetching failure!`});
-  });
+  };  
 });
 
 app.get('/todos/:id', authenticate, (req, res) => {
