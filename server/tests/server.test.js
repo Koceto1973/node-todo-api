@@ -250,6 +250,7 @@ describe('DELETE /users/me', () => {
   });
 });
 
+// POST note
 describe('POST /todos', () => {
 
   it('should create a new todo', (done) => {

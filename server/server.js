@@ -132,20 +132,27 @@ app.delete('/users/me', authenticate, (req,res) =>{
   
 });
 
-/////////////////////////////////  DATA API   /////////////////////////////////////////////////
+/////////////////////////////////   DATA API   /////////////////////////////////////////////////
 
-// POST todo
+// POST note
 app.post('/todos', authenticate, (req, res) => {
-  var todo = new Todo({
-    text: req.body.text,
-    _creator: req.user._id
-  });
+  
+  try {
+    var todo = new Todo({
+      text: req.body.text,
+      _creator: req.user._id
+    });
+  
+    todo.save().then(() => {
+      res.status(200).send({"note":"New note created!"});
+    }, (err) => {
+      throw err;
+    }); 
+  } catch(e) {
+    console.log(JSON.stringify(e,null,2)); 
+    res.status(400).send({"note":`New note creation failure!`});
+  };
 
-  todo.save().then((doc) => {
-    res.send(doc);
-  }, (e) => {
-    res.status(400).send(e);
-  });
 });
 
 app.get('/todos', authenticate, (req, res) => {
