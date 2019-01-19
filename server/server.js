@@ -161,7 +161,7 @@ app.post('/todos', authenticate, (req, res) => {
 
 });
 
-// GET notes
+// GET all notes
 app.get('/todos', authenticate, (req, res) => {
 
   try {
@@ -174,6 +174,7 @@ app.get('/todos', authenticate, (req, res) => {
         var notes = [];
         for(var i=0;i<todos.length;i++){
           var note = {
+            "_id": todos[i]._id,
             "text": todos[i].text,
             "completed": todos[i].completed,
             "completedAt": todos[i].completedAt
@@ -192,25 +193,37 @@ app.get('/todos', authenticate, (req, res) => {
   };  
 });
 
+// GET note
 app.get('/todos/:id', authenticate, (req, res) => {
-  var id = req.params.id;
+  try {
+    var id = req.params.id;
+  
+    if (!ObjectID.isValid(id)) { throw 'Invalid note Id!' };
 
-  if (!ObjectID.isValid(id)) {
-    return res.status(404).send();
+    if (!req.user ) { throw 'Invalid token!' };
+
+    Todo.findOne({
+       _id: id,
+       _creator: req.user._id })
+    .then((todo) => { 
+      if (!todo) { 
+        console.log('Forbidden access!'); 
+        return res.status(404).send({"note":`Note fetching failure!`}); 
+      };
+
+      res
+      .status(200)
+      .send({
+        "_id": todo._id,
+        "text": todo.text,
+        "completed": todo.completed,
+        "completedAt": todo.completedAt
+      });
+    }, (err) => { throw 'Error fetching note!' });
+  } catch(e) {
+    console.log(JSON.stringify(e,null,2)); 
+    res.status(404).send({"note":`Note fetching failure!`});
   }
-
-  Todo.findOne({
-    _id: id,
-    _creator: req.user._id
-  }).then((todo) => {
-    if (!todo) {
-      return res.status(404).send();
-    }
-
-    res.send({todo});
-  }).catch((e) => {
-    res.status(400).send();
-  });
 });
 
 app.delete('/todos/:id', authenticate, (req, res) => {

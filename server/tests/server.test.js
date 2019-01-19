@@ -300,7 +300,7 @@ describe('POST /todos', () => {
 
 });
 
-// GET notes
+// GET all notes
 describe('GET /todos', () => {
   it('should get all notes', (done) => {
     supertest(app)
@@ -325,19 +325,20 @@ describe('GET /todos', () => {
   });
 });
 
+// GET note
 describe('GET /todos/:id', () => {
-  it('should return todo doc', (done) => {
+  it('should return note', (done) => {
     supertest(app)
       .get(`/todos/${todos[0]._id.toHexString()}`) // ObjectId conversion to string
       .set('x-auth', users[0].tokens[0].token)
       .expect(200)
       .expect((res) => {
-        expect(res.body.todo.text).toBe(todos[0].text);
+        expect(res.body.text).toBe(todos[0].text);
       })
       .end(done);
   });
 
-  it('should not return todo doc created by other user', (done) => {
+  it('should not return note created by other user', (done) => {
     supertest(app)
       .get(`/todos/${todos[1]._id.toHexString()}`)
       .set('x-auth', users[0].tokens[0].token)
