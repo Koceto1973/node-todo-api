@@ -279,25 +279,27 @@ app.patch('/todos/:id', authenticate, (req, res) => {
 
 // DELETE note
 app.delete('/todos/:id', authenticate, (req, res) => {
-  var id = req.params.id;
+  try {
+    var id = req.params.id;
+    
+    if (!ObjectID.isValid(id)) { throw 'Invalid note Id!' }; // valid note id
+    
+    if (!req.user ) { throw 'Invalid token!' };  // valid user
+    
+    Todo.findOneAndRemove({ _id: id, _creator: req.user._id })
+    .then((todo) => { 
+      if (!todo) { 
+        console.log('No criteria match in DB!'); 
+        return res.status(404).send({"note":`Note deleting failure!`}); 
+      };
 
-  if (!ObjectID.isValid(id)) {
-    return res.status(404).send();
-  }
-
-  Todo.findOneAndRemove({
-    _id: id,
-    _creator: req.user._id
-  }).then((todo) => {
-    if (!todo) {
-      return res.status(404).send();
-    }
-
-    res.send({todo});
-  }).catch((e) => {
-    res.status(400).send();
-  });
-
+      res.status(200).send({"note":`Note deleting success!`});
+    })
+    .catch((e)=> {throw 'Error fetching note from DB!'});      
+  } catch(e) {
+    console.log(JSON.stringify(e,null,2)); 
+    res.status(404).send({"note":`Note deleting failure!`});
+  }; 
 });
 
 // DELETE notes
