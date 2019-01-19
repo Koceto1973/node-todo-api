@@ -302,7 +302,7 @@ app.delete('/todos/:id', authenticate, (req, res) => {
   }; 
 });
 
-// DELETE notes
+// DELETE notes per user
 
 app.listen(process.env.PORT, () => {
   console.log(`Started at port ${process.env.PORT}`);

@@ -481,7 +481,7 @@ describe('PATCH /todos/:id', () => {
 // DELETE note
 describe('DELETE /todos/:id', () => {
 
-  it('should remove a todo', (done) => {
+  it('should remove a note', (done) => {
     var hexId = todos[1]._id.toHexString();
 
     supertest(app)
@@ -489,7 +489,7 @@ describe('DELETE /todos/:id', () => {
       .set('x-auth', users[1].tokens[0].token)
       .expect(200)
       .expect((res) => {
-        expect(res.body.todo._id).toBe(hexId);
+        expect(res.body.note).toBe(`Note deleting success!`);
       })
       .end((err, res) => {
         if (err) {
@@ -503,7 +503,7 @@ describe('DELETE /todos/:id', () => {
       });
   });
 
-  it('should not remove a todo', (done) => {
+  it('should not remove a note of another user', (done) => {
     var hexId = todos[0]._id.toHexString();
 
     supertest(app)
@@ -522,7 +522,7 @@ describe('DELETE /todos/:id', () => {
       });
   });
 
-  it('should return 404 if todo not found', (done) => {
+  it('should return 404 if note is not found', (done) => {
     var hexId = new ObjectID().toHexString();
 
     supertest(app)
@@ -536,6 +536,16 @@ describe('DELETE /todos/:id', () => {
     supertest(app)
       .delete('/todos/123abc')
       .set('x-auth', users[1].tokens[0].token)
+      .expect(404)
+      .end(done);
+  });
+
+  it('should return 404 if user token is invalid', (done) => {
+    var hexId = todos[1]._id.toHexString();
+
+    supertest(app)
+      .delete(`/todos/${hexId}`)
+      .set('x-auth', users[1].tokens[0].token+'123')
       .expect(404)
       .end(done);
   });
