@@ -3,7 +3,7 @@ var {User} = require('./../models/user');
 // valid token => attaches user and token to the request ( which user, from which device )
 var authenticate = (req, res, next) => {
   var token = req.header('x-auth');  // alias for req.get(header)
-
+  
   User.findByToken(token)
   .then((user) => {
     if (!user) {

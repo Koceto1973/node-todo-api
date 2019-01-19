@@ -226,6 +226,57 @@ app.get('/todos/:id', authenticate, (req, res) => {
   }
 });
 
+// EDIT note
+app.patch('/todos/:id', authenticate, (req, res) => {
+  try {
+    var id = req.params.id;
+    
+    if (!ObjectID.isValid(id)) { throw 'Invalid note Id!' }; // valid note id
+    
+    if (!req.user ) { throw 'Invalid token!' };  // valid user
+    
+    var data = { 
+      "text": req.body.text.trim(), // content-type application/json
+      "completed": req.body.completed
+    };
+    
+   if (_.isBoolean(data.completed) && data.completed) {   // 'completed' and 'completedAt' format  
+    data.completedAt = new Date().getTime();
+    } else {
+      data.completed = false;
+      data.completedAt = null;
+    };
+
+    if ( data.text.length === 0 ) {
+      { throw 'New note without text!' };  // new text format
+    };
+
+    Todo.findOne({ _id: id, _creator: req.user._id })
+    .then((todo) => { 
+      if (!todo) { 
+        console.log('No criteria match in DB!'); 
+        return res.status(404).send({"note":`Note editing failure!`}); 
+      };
+
+      // id/user matched, text is ok, todo exist
+      if ((typeof todo.completedAt) === 'number' && todo.completed ) { // todo is completed
+        console.log('Todo had been completed!'); 
+        return res.status(404).send({"note":`Note editing failure!`});
+      } else {  // todo completion is still pending
+        Todo.updateOne(todo,{$set: data})
+        .then((todo)=>{
+          res.status(200).send({"note":`Note editing success!`});
+        })
+        .catch((e)=> {throw 'Error updating todo to DB!'});  
+      }
+    })
+    .catch((e)=> {throw 'Error fetching todo from DB!'});      
+  } catch(e) {
+    console.log(JSON.stringify(e,null,2)); 
+    res.status(404).send({"note":`Note editing failure!`});
+  }; 
+});
+
 app.delete('/todos/:id', authenticate, (req, res) => {
   var id = req.params.id;
 
@@ -247,34 +298,6 @@ app.delete('/todos/:id', authenticate, (req, res) => {
   });
 
 });
-
-app.patch('/todos/:id', authenticate, (req, res) => {
-  var id = req.params.id;
-  var body = _.pick(req.body, ['text', 'completed']);
-
-  if (!ObjectID.isValid(id)) {
-    return res.status(404).send();
-  }
-
-  if (_.isBoolean(body.completed) && body.completed) {
-    body.completedAt = new Date().getTime();
-  } else {
-    body.completed = false;
-    body.completedAt = null;
-  }
-
-  Todo.findOneAndUpdate({_id: id, _creator: req.user._id}, {$set: body}, {new: true}).then((todo) => {
-    if (!todo) {
-      return res.status(404).send();
-    }
-
-    res.send({todo});
-  }).catch((e) => {
-    res.status(400).send();
-  })
-});
-
-
 
 app.listen(process.env.PORT, () => {
   console.log(`Started at port ${process.env.PORT}`);

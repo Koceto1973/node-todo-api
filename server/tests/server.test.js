@@ -365,6 +365,78 @@ describe('GET /todos/:id', () => {
   });
 });
 
+// EDIT note
+describe('PATCH /todos/:id', () => {
+  it('should update the todo', (done) => {
+    var hexId = todos[0]._id.toHexString(); console.log(hexId);
+    var text = 'This should be the new text';
+
+    supertest(app)
+      .patch(`/todos/${hexId}`)
+      .set('x-auth', users[0].tokens[0].token)
+      .send({
+        completed: true,
+        text
+      })
+      .expect(200)
+      .expect((res) => {
+        expect(res.body.note).toBe("Note editing success!");
+      })
+      .end((err, res) => {
+        if (err) {
+          return done(err);
+        }
+
+      Todo.findOne({_Id: todos[0]._id})
+      .then((todo)=>{
+        console.log(todo);
+        expect(todo.text).toBe(text);
+        expect(todo.completed).toBe(true);
+        expect(todo.completedAt).toBe('number');
+        done();
+      })
+      .catch((e)=>{
+        done(e);
+      });
+    });
+  });
+
+  it('should not update the todo created by other user', (done) => {
+    var hexId = todos[0]._id.toHexString();
+    var text = 'This should be the new text';
+
+    supertest(app)
+      .patch(`/todos/${hexId}`)
+      .set('x-auth', users[1].tokens[0].token)
+      .send({
+        completed: true,
+        text
+      })
+      .expect(404)
+      .end(done);
+  });
+
+  it('should clear completedAt when todo is not completed', (done) => {
+    var hexId = todos[1]._id.toHexString();
+    var text = 'This should be the new text!!';
+
+    supertest(app)
+      .patch(`/todos/${hexId}`)
+      .set('x-auth', users[1].tokens[0].token)
+      .send({
+        completed: false,
+        text
+      })
+      .expect(200)
+      .expect((res) => {
+        expect(res.body.todo.text).toBe(text);
+        expect(res.body.todo.completed).toBe(false);
+        expect(res.body.todo.completedAt).toBeFalsy();
+      })
+      .end(done);
+  });
+});
+
 describe('DELETE /todos/:id', () => {
 
   it('should remove a todo', (done) => {
@@ -428,62 +500,7 @@ describe('DELETE /todos/:id', () => {
 
 });
 
-describe('PATCH /todos/:id', () => {
-  it('should update the todo', (done) => {
-    var hexId = todos[0]._id.toHexString();
-    var text = 'This should be the new text';
 
-    supertest(app)
-      .patch(`/todos/${hexId}`)
-      .set('x-auth', users[0].tokens[0].token)
-      .send({
-        completed: true,
-        text
-      })
-      .expect(200)
-      .expect((res) => {
-        expect(res.body.todo.text).toBe(text);
-        expect(res.body.todo.completed).toBe(true);
-        expect(typeof res.body.todo.completedAt).toBe('number');
-      })
-      .end(done);
-  });
-
-  it('should not update the todo created by other user', (done) => {
-    var hexId = todos[0]._id.toHexString();
-    var text = 'This should be the new text';
-
-    supertest(app)
-      .patch(`/todos/${hexId}`)
-      .set('x-auth', users[1].tokens[0].token)
-      .send({
-        completed: true,
-        text
-      })
-      .expect(404)
-      .end(done);
-  });
-
-  it('should clear completedAt when todo is not completed', (done) => {
-    var hexId = todos[1]._id.toHexString();
-    var text = 'This should be the new text!!';
-
-    supertest(app)
-      .patch(`/todos/${hexId}`)
-      .set('x-auth', users[1].tokens[0].token)
-      .send({
-        completed: false,
-        text
-      })
-      .expect(200)
-      .expect((res) => {
-        expect(res.body.todo.text).toBe(text);
-        expect(res.body.todo.completed).toBe(false);
-        expect(res.body.todo.completedAt).toBeFalsy();
-      })
-      .end(done);
-  });
-});
 
 
 
