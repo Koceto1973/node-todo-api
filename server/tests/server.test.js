@@ -367,8 +367,8 @@ describe('GET /todos/:id', () => {
 
 // EDIT note
 describe('PATCH /todos/:id', () => {
-  it('should update the todo', (done) => {
-    var hexId = todos[0]._id.toHexString(); console.log(hexId);
+  it('should update the note', (done) => {
+    var hexId = todos[0]._id.toHexString(); 
     var text = 'This should be the new text';
 
     supertest(app)
@@ -387,12 +387,12 @@ describe('PATCH /todos/:id', () => {
           return done(err);
         }
 
-      Todo.findOne({_Id: todos[0]._id})
+      Todo.findById(todos[0]._id)
       .then((todo)=>{
-        console.log(todo);
+         
         expect(todo.text).toBe(text);
         expect(todo.completed).toBe(true);
-        expect(todo.completedAt).toBe('number');
+        expect(typeof todo.completedAt).toBe('number');
         done();
       })
       .catch((e)=>{
@@ -401,8 +401,8 @@ describe('PATCH /todos/:id', () => {
     });
   });
 
-  it('should not update the todo created by other user', (done) => {
-    var hexId = todos[0]._id.toHexString();
+  it('should not update the note if id is invalid', (done) => {
+    var hexId = todos[0]._id.toHexString()+'123';
     var text = 'This should be the new text';
 
     supertest(app)
@@ -416,7 +416,53 @@ describe('PATCH /todos/:id', () => {
       .end(done);
   });
 
-  it('should clear completedAt when todo is not completed', (done) => {
+  it('should not update the note if user token is invalid', (done) => {
+    var hexId = todos[0]._id.toHexString();
+    var text = 'This should be the new text';
+
+    supertest(app)
+      .patch(`/todos/${hexId}`)
+      .set('x-auth', users[1].tokens[0].token+'123')
+      .send({
+        completed: true,
+        text
+      })
+      .expect(404)
+      .end(done);
+  });
+
+  it('should not update the note with no text', (done) => {
+    var hexId = todos[0]._id.toHexString();
+    var text = '   ';
+
+    supertest(app)
+      .patch(`/todos/${hexId}`)
+      .set('x-auth', users[1].tokens[0].token)
+      .send({
+        completed: true,
+        text
+      })
+      .expect(404)
+      .end(done);
+  });
+
+  it('should not update the note created by other user or if id is not registered', (done) => {
+    var hexId = todos[0]._id.toHexString();
+    // var hexId = new ObjectID().toHexString();
+    var text = 'This should be the new text';
+
+    supertest(app)
+      .patch(`/todos/${hexId}`)
+      .set('x-auth', users[1].tokens[0].token)
+      .send({
+        completed: true,
+        text
+      })
+      .expect(404)
+      .end(done);
+  });
+
+  it('should not update completed note', (done) => {
     var hexId = todos[1]._id.toHexString();
     var text = 'This should be the new text!!';
 
@@ -427,16 +473,12 @@ describe('PATCH /todos/:id', () => {
         completed: false,
         text
       })
-      .expect(200)
-      .expect((res) => {
-        expect(res.body.todo.text).toBe(text);
-        expect(res.body.todo.completed).toBe(false);
-        expect(res.body.todo.completedAt).toBeFalsy();
-      })
+      .expect(404)
       .end(done);
   });
 });
 
+// DELETE note
 describe('DELETE /todos/:id', () => {
 
   it('should remove a todo', (done) => {
@@ -499,6 +541,8 @@ describe('DELETE /todos/:id', () => {
   });
 
 });
+
+// DELETE notes
 
 
 

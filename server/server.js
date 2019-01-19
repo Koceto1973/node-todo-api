@@ -277,6 +277,7 @@ app.patch('/todos/:id', authenticate, (req, res) => {
   }; 
 });
 
+// DELETE note
 app.delete('/todos/:id', authenticate, (req, res) => {
   var id = req.params.id;
 
@@ -298,6 +299,8 @@ app.delete('/todos/:id', authenticate, (req, res) => {
   });
 
 });
+
+// DELETE notes
 
 app.listen(process.env.PORT, () => {
   console.log(`Started at port ${process.env.PORT}`);
