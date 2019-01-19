@@ -161,7 +161,7 @@ app.post('/todos', authenticate, (req, res) => {
 
 });
 
-// GET all notes
+// GET all notes per user
 app.get('/todos', authenticate, (req, res) => {
 
   try {
@@ -302,7 +302,29 @@ app.delete('/todos/:id', authenticate, (req, res) => {
   }; 
 });
 
-// DELETE notes per user
+// DELETE all notes per user
+app.delete('/todos', authenticate, (req, res) => {
+  try {
+    if(!req.user ) {
+      throw 'Bad request body - faulty token!' ;
+    } else {
+      Todo.findOneAndRemove({ _creator: req.user._id})
+      .then((todos) => {
+        if (!todos) {
+          console.log(`User has no notes for deletion!`); 
+          return res.status(200).send({"note":`User has no notes for deletion!`});
+        } else {
+          res.status(200).send({"note":"All notes deleting success"});
+        }
+      }, (e) => {
+        throw e;
+      });
+    }
+  } catch(e) {
+    console.log(JSON.stringify(e,null,2)); 
+    res.status(400).send({"note":`All notes deleting failure!`});
+  };  
+});
 
 app.listen(process.env.PORT, () => {
   console.log(`Started at port ${process.env.PORT}`);

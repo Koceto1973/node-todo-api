@@ -300,7 +300,7 @@ describe('POST /todos', () => {
 
 });
 
-// GET all notes
+// GET all notes per user
 describe('GET /todos', () => {
   it('should get all notes', (done) => {
     supertest(app)
@@ -552,7 +552,7 @@ describe('DELETE /todos/:id', () => {
 
 });
 
-// DELETE notes
+// DELETE all notes per user
 
 
 
