@@ -12,9 +12,16 @@ var {Todo} = require('./models/todo');
 var {User} = require('./models/user');
 var {authenticate} = require('./middleware/authenticate');
 
+var intro = require('./config/intro.json');
+
 var app = express();
 
 app.use(bodyParser.json());  // middleware for body parsing
+
+// postman setup sent as intro.json for API welcome/ no route selected 
+app.get('/',(req,res)=>{
+  res.status(200).send(intro);
+});
 
 //////////////////////  AUTH API ///////////////////////////////
 

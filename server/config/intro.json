@@ -1,0 +1,539 @@
+{
+	"info": {
+		"_postman_id": "6590bf8a-4b8b-480b-aa8d-d7082db6226c",
+		"name": "Node-Todo API",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "SIGN UP",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "4978e0c8-5fec-48cf-9174-02b59dc16091",
+						"exec": [
+							"var token_main = postman.getResponseHeader('x-auth');\r",
+							"pm.environment.set(\"x-auth\", token_main);"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "",
+						"value": "",
+						"type": "text",
+						"disabled": true
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"email\":\"john.smith@gmail.com\",\n\t\"password\":\"abcdef123456\",\n\t\"currentDeviceId\":\"main_ahsus38323729d832d92d33\"\n}"
+				},
+				"url": {
+					"raw": "{{url}}/users",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"users"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "LOG IN main device",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "db4d9ab1-28fb-4d2f-be12-90e92c7ce636",
+						"exec": [
+							"var token_main = postman.getResponseHeader('x-auth');\r",
+							"pm.environment.set(\"x-auth\", token_main);"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"email\":\"john.smith@gmail.com\",\n\t\"password\":\"abcdef123456\",\n\t\"currentDeviceId\":\"main_ahsus38323729d832d92d33\"\n}"
+				},
+				"url": {
+					"raw": "{{url}}/users/login",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"users",
+						"login"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "LOG IN secondary device",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "e23c87b6-c329-420c-bba5-ca9d3c4bec31",
+						"exec": [
+							"var token_secondary = postman.getResponseHeader(\"x-auth\");\r",
+							"pm.environment.set(\"x-auth\", token_secondary);"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"email\":\"john.smith@gmail.com\",\n\t\"password\":\"abcdef123456\",\n\t\"currentDeviceId\":\"secondary_ahsus38323729d832d92d33\"\n}"
+				},
+				"url": {
+					"raw": "{{url}}/users/login",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"users",
+						"login"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Authentification",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "x-auth",
+						"value": "{{x-auth}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{url}}/users/me/token",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"users",
+						"me",
+						"token"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "LOG OUT current device",
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "x-auth",
+						"type": "text",
+						"value": "{{x-auth}}"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{url}}/users/me/token",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"users",
+						"me",
+						"token"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "LOG OUT all devices per user",
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "x-auth",
+						"type": "text",
+						"value": "{{x-auth}}"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{url}}/users/me/tokens",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"users",
+						"me",
+						"tokens"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "SIGN OFF",
+			"request": {
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "x-auth",
+						"value": "{{x-auth}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{url}}/users/me",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"users",
+						"me"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "POST note",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "4a12497b-b632-4460-97aa-ca828832aeb4",
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "x-auth",
+						"value": "{{x-auth}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"text\":\t\"New note!\"\n}"
+				},
+				"url": {
+					"raw": "{{url}}/todos",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"todos"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "POST another note",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "4a12497b-b632-4460-97aa-ca828832aeb4",
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "x-auth",
+						"value": "{{x-auth}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"text\":\t\"Another note!\"\n}"
+				},
+				"url": {
+					"raw": "{{url}}/todos",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"todos"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "GET all notes",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "0b71fd93-b2d9-42f2-b339-b53563c1d7ba",
+						"exec": [
+							"var body = JSON.parse(responseBody);\r",
+							"if (body.notes.length !== 0) {\r",
+							"    pm.environment.set(\"firstNoteId\", body.notes[0]._id); \r",
+							"}\r",
+							"\t\r",
+							"\r",
+							"\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "x-auth",
+						"value": "{{x-auth}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{url}}/todos",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"todos"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "GET note",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "x-auth",
+						"value": "{{x-auth}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{url}}/todos/{{firstNoteId}}",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"todos",
+						"{{firstNoteId}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "EDIT note",
+			"request": {
+				"method": "PATCH",
+				"header": [
+					{
+						"key": "x-auth",
+						"name": "Content-Type",
+						"value": "{{x-auth}}",
+						"type": "text"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"completed\": true,\n\t\"text\": \"Note with updated text\"\n}"
+				},
+				"url": {
+					"raw": "{{url}}/todos/{{firstNoteId}}",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"todos",
+						"{{firstNoteId}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "DELETE note",
+			"request": {
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "x-auth",
+						"value": "{{x-auth}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{url}}/todos/{{firstNoteId}}",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"todos",
+						"{{firstNoteId}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "DELETE all notes per user",
+			"request": {
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "x-auth",
+						"type": "text",
+						"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1YzM3NzA5NzhlNTRjYzA0ZTBkMjI2MTIiLCJhY2Nlc3MiOiJhdXRoIiwiaWF0IjoxNTQ3MTM3MTc1fQ.YNIDwDz6POu_lxgxQTN6_JA-9hGkPrbTJw_WaoBXn0w"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{url}}/users/me/token",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"users",
+						"me",
+						"token"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
