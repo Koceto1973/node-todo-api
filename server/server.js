@@ -169,9 +169,8 @@ app.get('/todos', authenticate, (req, res) => {
       throw 'Bad request body - faulty token!' ;
     } else {
       Todo.find({ _creator: req.user._id
-      }).then((todos) => {
-        
-        var notes = [];
+      }).then((todos) => {        
+        var notes = []; 
         for(var i=0;i<todos.length;i++){
           var note = {
             "_id": todos[i]._id,
@@ -308,11 +307,11 @@ app.delete('/todos', authenticate, (req, res) => {
     if(!req.user ) {
       throw 'Bad request body - faulty token!' ;
     } else {
-      Todo.findOneAndRemove({ _creator: req.user._id})
-      .then((todos) => {
+      Todo.deleteMany({ _creator: req.user._id})
+      .then((todos) => { 
         if (!todos) {
-          console.log(`User has no notes for deletion!`); 
-          return res.status(200).send({"note":`User has no notes for deletion!`});
+          console.log(`All notes deleting failure!`); 
+          return res.status(404).send({"note":`All notes deleting failure!`});
         } else {
           res.status(200).send({"note":"All notes deleting success"});
         }

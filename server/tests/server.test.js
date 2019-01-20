@@ -5,7 +5,7 @@ const {ObjectID} = require('mongodb');
 const {app} = require('./../server');
 const {Todo} = require('./../models/todo');
 const {User} = require('./../models/user');
-const {todos, populateTodos, users, populateUsers} = require('./seed/seed');
+let {todos, populateTodos, users, populateUsers} = require('./seed/seed');
 
 beforeEach(populateUsers);
 beforeEach(populateTodos);
@@ -553,7 +553,31 @@ describe('DELETE /todos/:id', () => {
 });
 
 // DELETE all notes per user
+describe('DELETE /todos', () => {
 
+  it('should delete all notes', (done) => {
+    supertest(app)
+      .delete('/todos')
+      .set('x-auth', users[0].tokens[0].token)
+      .expect(200)
+      .expect((res) => {
+        expect(res.body.note).toBe("All notes deleting success");
+      })
+      .end(done);
+  });
+
+  it('should not delete notes if token is faulty', (done) => {
+    supertest(app)
+      .delete('/todos')
+      .set('x-auth', "123456789")
+      .expect(400)
+      .expect((res) => {
+        expect(res.body.note).toBe(`All notes deleting failure!`);
+      })
+      .end(done);
+  });
+  
+});
 
 
 
